@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登陆页面</title>
+</head>
+
+<body>
+  <div>
+    <table align="center">
+      <tr>
+        <td align="right">用户名:</td>
+        <td><input id="username" type="text" name="username"></td>
+        <td id="usernamecontent"></td>
+      </tr>
+      <tr>
+        <td align="right">密码:</td>
+        <td><input id="password" type="password" name="password"></td>
+        <td id="pwdcontent"></td>
+      </tr>
+      <tr>
+        <td align="right">确认密码:</td>
+        <td><input id="pwd2" type="password" name="pwd2"></td>
+        <td id="pwd2content"></td>
+      </tr>
+      <tr>
+        <td>验证码</td>
+        <td>
+          <input id="imgcode" type="text" name="imgcode" maxlength="4" autocomplete="off">
+          <img src="imgcode.php" alt="" id="img">
+        <td id="imgcodecontent"></td>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><input type="checkbox" name="remember" value="1" id="remember">7天内自动登录</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <input type="submit" value="注册" id="submit">
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+<script src="lib/jquery-1.7.2.min.js" type="text/javascript"></script>
+<script>
+      function post(url, data, callback) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('post', url);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            callback(xhr.responseText);
+            // console.log(xhr.responseText);
+            // console.log(JSON.parse(xhr.responseText));
+            // return xhr.responseText;
+          }
+        }
+        xhr.send(data);
+      }
+  $('#username').blur(
+  function () {
+          post('register.php', 'username=' + $('#username').val(), function (f) {
+          if (f == '用户名已存在！') {
+            $('#usernamecontent').html('用户名已存在！')
+            return
+          }else{
+		  $('#usernamecontent').html('可以用')
+        }})
+  }
+  
+  )
+  $('#password').blur(function () {
+    if (/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/.test($('#password').val())) {
+      console.log('ok');
+      $("#pwdcontent").html('ok')
+    } else {
+      console.log('不行');
+      $("#pwdcontent").html('不行')
+    }
+  })
+  $('#pwd2').blur(function () {
+    if ($('#pwd2').val() != $('#password').val()) {
+      $("#pwd2content").html('密码不一致')
+    } else {
+      $("#pwd2content").html('密码一致')
+    }
+  })
+  $('#submit').click(function () {
+    //alert($('input[type="password"]').val())
+    if ($('#pwd2').val() != $('#password').val()) {
+      alert('密码不一致');
+      return false;
+    } else {
+      //$('#submit').attr("disabled", false)
+      // url
+      // data,key1=value1&&key2=value2的字符串，可填null
+
+      post('register.php', 'username=' + $('#username').val() +
+        '&' + 'password=' + $('#password').val() + '&' + 'imgcode=' + $('#imgcode').val()
+        + '&remember=' + $('#remember').val(), function (f) {
+          if (f == '用户名已存在！') {
+            $('#usernamecontent').html('用户名已存在！')
+            return
+          }
+          if (f == '验证码不正确') {
+            $('#imgcodecontent').html('验证码不正确')
+            return
+          }
+          if (f == '密码不合规') {
+            $("#pwdcontent").html('密码不合规')
+            return
+          }
+          console.log(f);
+          f = JSON.parse(f)
+          alert(f[0])
+          location.href = f[1];
+        })
+    }
+  })
+  $('#pwd2').change(function () {
+    if ($('#username').val() && $('#pwd2').val() && $('#password').val() && $('#imgcode').val()) {
+      $('#submit').attr("disabled", false)
+    } else {
+      $('#submit').attr("disabled", true)
+      return false;
+    }
+  })
+  $('#username').change(function () {
+    if ($('#username').val() && $('#pwd2').val() && $('#password').val() && $('#imgcode').val()) {
+      $('#submit').attr("disabled", false)
+    } else {
+      $('#submit').attr("disabled", true)
+      return false;
+    }
+  })
+  $('#password').change(function () {
+    if ($('#username').val() && $('#pwd2').val() && $('#password').val() && $('#imgcode').val()) {
+      $('#submit').attr("disabled", false)
+    } else {
+      $('#submit').attr("disabled", true)
+      return false;
+    }
+  })
+  $('#imgcode').change(function () {
+    if ($('#username').val() && $('#pwd2').val() && $('#password').val() && $('#imgcode').val()) {
+      $('#submit').attr("disabled", false)
+    } else {
+      $('#submit').attr("disabled", true)
+      return false;
+    }
+  })
+  var img = document.getElementById('img');
+  img.onclick = function () {
+    this.src = 'imgcode.php?id=' + Math.random();
+  }
+</script>
+
+</html>
